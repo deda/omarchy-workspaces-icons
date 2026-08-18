@@ -169,11 +169,11 @@ BarWidget {
         readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
         readonly property real iconSize: Style.space(10)
 
-        spacing: Style.space(2)
+        spacing: Style.space(4)
 
         WidgetButton {
           bar: root.bar
-          text: cell.focused ? "\uDB85\uDCFB" : (cell.modelData === 10 ? "0" : String(cell.modelData))
+          text: cell.focused ? "\uDB85\uDCFB" : (cell.modelData === 10 ? "0:" : String(cell.modelData) + ":")
           opacity: cell.occupied || cell.focused ? 1 : 0.5
           horizontalMargin: 6
           verticalPadding: 6
