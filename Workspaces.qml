@@ -172,12 +172,13 @@ BarWidget {
         spacing: 0
 
         Item {
+          Layout.alignment: Qt.AlignVCenter
           implicitWidth: numberButton.implicitWidth
           implicitHeight: numberButton.implicitHeight
 
           Rectangle {
             anchors.fill: parent
-            radius: height / 2
+            radius: Style.space(3)
             color: root.bar ? root.bar.barForeground : Color.foreground
             visible: cell.focused
           }
@@ -191,9 +192,9 @@ BarWidget {
             useActiveColor: false
             opacity: cell.occupied || cell.focused ? 1 : 0.5
             horizontalMargin: 6
-            verticalPadding: 6
+            verticalPadding: 2
             fixedWidth: root.vertical ? root.barSize : Style.space(20)
-            fixedHeight: root.barSize
+            fixedHeight: root.vertical ? root.barSize : cell.iconSize + Style.space(4)
             onPressed: function() { root.focusWorkspace(cell.modelData) }
           }
         }
