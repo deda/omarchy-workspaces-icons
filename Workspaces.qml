@@ -178,7 +178,7 @@ BarWidget {
 
           Rectangle {
             anchors.centerIn: parent
-            width: parent.width
+            width: parent.width - Style.space(4)
             height: Math.min(parent.height, cell.iconSize + Style.space(4))
             radius: Style.space(3)
             color: root.bar ? root.bar.barForeground : Color.foreground
