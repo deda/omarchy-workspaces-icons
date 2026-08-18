@@ -177,7 +177,9 @@ BarWidget {
           implicitHeight: numberButton.implicitHeight
 
           Rectangle {
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: parent.width
+            height: Math.min(parent.height, cell.iconSize + Style.space(4))
             radius: Style.space(3)
             color: root.bar ? root.bar.barForeground : Color.foreground
             visible: cell.focused
@@ -192,9 +194,9 @@ BarWidget {
             useActiveColor: false
             opacity: cell.occupied || cell.focused ? 1 : 0.5
             horizontalMargin: 6
-            verticalPadding: 2
+            verticalPadding: 6
             fixedWidth: root.vertical ? root.barSize : Style.space(20)
-            fixedHeight: root.vertical ? root.barSize : cell.iconSize + Style.space(4)
+            fixedHeight: root.barSize
             onPressed: function() { root.focusWorkspace(cell.modelData) }
           }
         }
