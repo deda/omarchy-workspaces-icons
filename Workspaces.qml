@@ -153,7 +153,7 @@ BarWidget {
     anchors.fill: parent
     anchors.rightMargin: root.trailingGap
     columns: root.vertical ? 1 : root.workspaceIds().length
-    columnSpacing: root.vertical ? 0 : Style.space(1)
+    columnSpacing: root.vertical ? 0 : Style.space(6)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
     Repeater {
@@ -169,7 +169,7 @@ BarWidget {
         readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
         readonly property real iconSize: Style.space(10)
 
-        spacing: Style.space(4)
+        spacing: Style.space(2)
 
         WidgetButton {
           bar: root.bar
