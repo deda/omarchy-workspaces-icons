@@ -5,7 +5,7 @@ An [Omarchy](https://omarchy.org/) shell bar widget — a fork of the built-in
 next to its workspace number. Click an icon to switch to that window's
 workspace.
 
-![Screenshot](screenshot.png)
+![Preview](preview.png)
 
 ## Install
 
