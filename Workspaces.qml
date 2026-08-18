@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Hyprland
 import qs.Commons
 import qs.Ui
@@ -71,15 +72,30 @@ BarWidget {
     return hostMatch[1].replace(/^www\./, "").toLowerCase()
   }
 
-  // Window classes with no desktop entry at all to fall back to a real icon
-  // instead of the generic application-x-executable glyph. org.omarchy.agent
-  // is a fixed shared class every coding agent CLI launches under (see
-  // omarchy-agent), so there's no single desktop entry to resolve to - reuse
-  // the Claude icon the omarchy.agents bar panel itself ships, since Claude
-  // is Omarchy's default agent.
-  readonly property var manualIconOverrides: ({
-    "org.omarchy.agent": "/usr/share/omarchy/shell/plugins/agents/assets/claude.svg",
-  })
+  // org.omarchy.agent is a fixed class every coding agent CLI shares (see
+  // omarchy-agent), so there's no desktop entry to resolve an icon from.
+  // Only Claude and Codex ship a dedicated mark in the agents bar panel's own
+  // assets; any other/undetected agent falls back to Claude's, since it's
+  // Omarchy's default.
+  readonly property string agentIconsPath: "/usr/share/omarchy/shell/plugins/agents/assets/"
+  readonly property var knownAgentBinaries: ["claude", "codex", "copilot", "crush", "grok", "omp", "pi"]
+
+  function agentIconNameFor(binary) {
+    return binary === "codex" ? "codex" : "claude"
+  }
+
+  // Descend up to 5 levels of children from the window's PID looking for a
+  // known agent binary (the window's own PID is usually the terminal
+  // emulator's, with the agent CLI running as its child/grandchild).
+  function agentDetectScript(pid) {
+    return "frontier=" + pid + "; for d in 1 2 3 4 5; do "
+      + "frontier=$(pgrep -P \"$frontier\" | tr '\\n' ',' | sed 's/,$//'); "
+      + "[ -z \"$frontier\" ] && break; "
+      + "for p in $(echo \"$frontier\" | tr ',' ' '); do "
+      + "c=$(ps -o comm= -p \"$p\" 2>/dev/null); "
+      + "case \"$c\" in " + root.knownAgentBinaries.join("|") + ") echo \"$c\"; exit 0;; esac; "
+      + "done; done"
+  }
 
   // Match a running window back to the same desktop entry the app launcher
   // menu would show for it, so icons stay consistent with the launcher.
@@ -165,17 +181,23 @@ BarWidget {
             model: cell.toplevels
 
             Image {
+              id: icon
               required property var modelData
 
               readonly property string windowClass: (modelData.wayland && modelData.wayland.appId)
                 || (modelData.lastIpcObject && modelData.lastIpcObject.class) || ""
+              readonly property int windowPid: (modelData.lastIpcObject && modelData.lastIpcObject.pid) || 0
+              readonly property bool isAgentWindow: windowClass === "org.omarchy.agent"
+              property string detectedAgentBinary: ""
 
               // Resolve through the app's desktop entry first, same as the Omarchy
               // app launcher menu does, since a window's app id often differs from
               // the icon name in its .desktop file (e.g. Slack, Obsidian).
               readonly property var desktopEntry: root.findDesktopEntry(windowClass)
               readonly property string iconName: (desktopEntry && desktopEntry.icon) || windowClass
-              readonly property string overridePath: root.manualIconOverrides[windowClass] || ""
+              readonly property string overridePath: isAgentWindow
+                ? root.agentIconsPath + root.agentIconNameFor(detectedAgentBinary) + ".svg"
+                : ""
 
               width: cell.iconSize
               height: cell.iconSize
@@ -185,6 +207,17 @@ BarWidget {
               asynchronous: true
               smooth: true
               visible: status === Image.Ready
+
+              Process {
+                running: icon.isAgentWindow && icon.windowPid > 0
+                command: ["bash", "-c", root.agentDetectScript(icon.windowPid)]
+                stdout: SplitParser {
+                  onRead: function(line) {
+                    var trimmed = String(line || "").trim()
+                    if (trimmed !== "") icon.detectedAgentBinary = trimmed
+                  }
+                }
+              }
 
               MouseArea {
                 anchors.fill: parent
