@@ -171,15 +171,31 @@ BarWidget {
 
         spacing: 0
 
-        WidgetButton {
-          bar: root.bar
-          text: cell.focused ? "\uDB85\uDCFB" : (cell.modelData === 10 ? "0:" : String(cell.modelData) + ":")
-          opacity: cell.occupied || cell.focused ? 1 : 0.5
-          horizontalMargin: 6
-          verticalPadding: 6
-          fixedWidth: root.vertical ? root.barSize : Style.space(20)
-          fixedHeight: root.barSize
-          onPressed: function() { root.focusWorkspace(cell.modelData) }
+        Item {
+          implicitWidth: numberButton.implicitWidth
+          implicitHeight: numberButton.implicitHeight
+
+          Rectangle {
+            anchors.fill: parent
+            radius: height / 2
+            color: root.bar ? root.bar.barForeground : Color.foreground
+            visible: cell.focused
+          }
+
+          WidgetButton {
+            id: numberButton
+            anchors.fill: parent
+            bar: root.bar
+            text: cell.modelData === 10 ? "0:" : String(cell.modelData) + ":"
+            foreground: cell.focused ? Color.bar.background : (root.bar ? root.bar.barForeground : Color.foreground)
+            useActiveColor: false
+            opacity: cell.occupied || cell.focused ? 1 : 0.5
+            horizontalMargin: 6
+            verticalPadding: 6
+            fixedWidth: root.vertical ? root.barSize : Style.space(20)
+            fixedHeight: root.barSize
+            onPressed: function() { root.focusWorkspace(cell.modelData) }
+          }
         }
 
         Row {
