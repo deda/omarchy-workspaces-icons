@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "deda.workspaces-icons",
+  "name": "Workspaces with Window Icons",
+  "version": "1.0.0",
+  "author": "deda",
+  "description": "Workspace number indicators that also show the icon of each running window on that workspace, clickable to switch",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Workspaces.qml"
+  },
+  "barWidget": {
+    "displayName": "Workspaces with Window Icons",
+    "description": "Workspace number indicators with running window icons",
+    "category": "Compositor",
+    "allowMultiple": false
+  }
+}
