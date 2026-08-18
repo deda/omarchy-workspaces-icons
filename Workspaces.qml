@@ -36,33 +36,72 @@ BarWidget {
     root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ workspace = \"" + id + "\" })"))
   }
 
+  // Dot-separated class segments, lowercased (e.g. "md.Obsidian" -> ["md", "obsidian"]).
+  function classSegments(value) {
+    return String(value || "").toLowerCase().split(".").filter(function(s) { return s.length > 0 })
+  }
+
+  // True if `needle` appears as a contiguous, whole-segment run inside `haystack`.
+  // Segment-based so "obs" doesn't match inside "md.obsidian.obsidian" the way a
+  // raw substring check would (that's how OBS Studio's StartupWMClass, "obs",
+  // used to get matched instead of Obsidian's).
+  function segmentsContain(haystack, needle) {
+    if (needle.length === 0 || needle.length > haystack.length) return false
+    for (var start = 0; start <= haystack.length - needle.length; start++) {
+      var match = true
+      for (var j = 0; j < needle.length; j++) {
+        if (haystack[start + j] !== needle[j]) { match = false; break }
+      }
+      if (match) return true
+    }
+    return false
+  }
+
+  // Omarchy webapps launch via `omarchy-launch-webapp <url>` (Chrome --app
+  // mode), which has no StartupWMClass at all - Chrome instead generates a
+  // class embedding the site's hostname (e.g. "chrome-discord.com__..." for
+  // https://discord.com/...). Extract that hostname from the entry's Exec so
+  // it can be matched against the live window class.
+  function webappHostname(entry) {
+    var exec = String(entry.execString || "")
+    var execMatch = exec.match(/omarchy-launch-(?:or-focus-)?webapp\s+"?(https?:\/\/[^\s"]+)/)
+    if (!execMatch) return ""
+    var hostMatch = execMatch[1].match(/^https?:\/\/([^\/]+)/)
+    if (!hostMatch) return ""
+    return hostMatch[1].replace(/^www\./, "").toLowerCase()
+  }
+
   // Match a running window back to the same desktop entry the app launcher
   // menu would show for it, so icons stay consistent with the launcher.
-  // Desktop entries record the window class they expect under
-  // StartupWMClass, which is often different from the entry's own id (e.g.
-  // Obsidian's id is "obsidian" but StartupWMClass is "md.Obsidian") - byId()
-  // and heuristicLookup() only match against id/name, not StartupWMClass, so
-  // check that first.
   function findDesktopEntry(appId) {
     if (!appId) return null
 
     var lower = appId.toLowerCase()
+    var appSegments = classSegments(appId)
     var values = DesktopEntries.applications.values || []
-    var i, startupClass
+    var i, entry, startupClass, hostname
 
+    // 1. Exact StartupWMClass match.
     for (i = 0; i < values.length; i++) {
       startupClass = String(values[i].startupClass || "").toLowerCase()
       if (startupClass !== "" && startupClass === lower) return values[i]
     }
 
-    // Some packaged apps report a runtime app id that only partially matches
-    // their own StartupWMClass (e.g. Obsidian ships "md.Obsidian" but the
-    // live window reports "md.obsidian.Obsidian") - allow a substring match
-    // as a second pass before falling back to id/name-based lookups.
+    // 2. StartupWMClass as a contiguous run of segments within the live app
+    // id (e.g. Obsidian ships "md.Obsidian" but the live window reports
+    // "md.obsidian.Obsidian").
     for (i = 0; i < values.length; i++) {
-      startupClass = String(values[i].startupClass || "").toLowerCase()
-      if (startupClass !== "" && (lower.indexOf(startupClass) !== -1 || startupClass.indexOf(lower) !== -1))
+      startupClass = String(values[i].startupClass || "")
+      if (startupClass === "") continue
+      var startupSegments = classSegments(startupClass)
+      if (segmentsContain(appSegments, startupSegments) || segmentsContain(startupSegments, appSegments))
         return values[i]
+    }
+
+    // 3. Omarchy webapp hostname match (Discord, WhatsApp, etc.).
+    for (i = 0; i < values.length; i++) {
+      hostname = webappHostname(values[i])
+      if (hostname !== "" && lower.indexOf(hostname) !== -1) return values[i]
     }
 
     return DesktopEntries.byId(appId) || DesktopEntries.heuristicLookup(appId) || null
