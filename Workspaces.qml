@@ -86,7 +86,8 @@ BarWidget {
             Image {
               required property var modelData
 
-              readonly property string windowClass: (modelData.lastIpcObject && modelData.lastIpcObject.class) || ""
+              readonly property string windowClass: (modelData.wayland && modelData.wayland.appId)
+                || (modelData.lastIpcObject && modelData.lastIpcObject.class) || ""
 
               width: cell.iconSize
               height: cell.iconSize
