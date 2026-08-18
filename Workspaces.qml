@@ -71,6 +71,16 @@ BarWidget {
     return hostMatch[1].replace(/^www\./, "").toLowerCase()
   }
 
+  // Window classes with no desktop entry at all to fall back to a real icon
+  // instead of the generic application-x-executable glyph. org.omarchy.agent
+  // is a fixed shared class every coding agent CLI launches under (see
+  // omarchy-agent), so there's no single desktop entry to resolve to - reuse
+  // the Claude icon the omarchy.agents bar panel itself ships, since Claude
+  // is Omarchy's default agent.
+  readonly property var manualIconOverrides: ({
+    "org.omarchy.agent": "/usr/share/omarchy/shell/plugins/agents/assets/claude.svg",
+  })
+
   // Match a running window back to the same desktop entry the app launcher
   // menu would show for it, so icons stay consistent with the launcher.
   function findDesktopEntry(appId) {
@@ -165,10 +175,12 @@ BarWidget {
               // the icon name in its .desktop file (e.g. Slack, Obsidian).
               readonly property var desktopEntry: root.findDesktopEntry(windowClass)
               readonly property string iconName: (desktopEntry && desktopEntry.icon) || windowClass
+              readonly property string overridePath: root.manualIconOverrides[windowClass] || ""
 
               width: cell.iconSize
               height: cell.iconSize
-              source: iconName !== "" ? Quickshell.iconPath(iconName, "application-x-executable") : ""
+              source: overridePath !== "" ? Util.fileUrl(overridePath)
+                : iconName !== "" ? Quickshell.iconPath(iconName, "application-x-executable") : ""
               fillMode: Image.PreserveAspectFit
               asynchronous: true
               smooth: true
