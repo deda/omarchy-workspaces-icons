@@ -4,6 +4,7 @@
   "name": "Workspaces with Window Icons",
   "version": "1.0.0",
   "author": "deda",
+  "license": "MIT",
   "description": "Workspace number indicators that also show the icon of each running window on that workspace, clickable to switch",
   "kinds": [
     "bar-widget"

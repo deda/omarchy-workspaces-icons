@@ -25,3 +25,7 @@ omarchy plugin enable deda.workspaces-icons
 ```bash
 omarchy plugin update deda.workspaces-icons
 ```
+
+## License
+
+[MIT](LICENSE)
