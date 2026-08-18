@@ -169,7 +169,7 @@ BarWidget {
         readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
         readonly property real iconSize: Style.space(10)
 
-        spacing: Style.space(2)
+        spacing: 0
 
         WidgetButton {
           bar: root.bar
