@@ -219,6 +219,11 @@ BarWidget {
               readonly property bool isAgentWindow: windowClass === "org.omarchy.agent"
               property string detectedAgentBinary: ""
               readonly property string windowTitle: modelData.title || ""
+              // Bar.showTooltip() only actually shows the tooltip if the target
+              // exposes a `tooltipHovered` property (see how WidgetButton does
+              // it) - a plain Image has none, so without this the call above
+              // silently no-ops every time.
+              readonly property bool tooltipHovered: hoverArea.containsMouse
 
               // Unwrap omarchy-launch-tui's "org.omarchy.<binary>" convention
               // (org.omarchy.agent is handled separately, see isAgentWindow) so
@@ -258,6 +263,7 @@ BarWidget {
               }
 
               MouseArea {
+                id: hoverArea
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
