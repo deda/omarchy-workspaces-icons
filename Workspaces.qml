@@ -218,6 +218,7 @@ BarWidget {
               readonly property int windowPid: (modelData.lastIpcObject && modelData.lastIpcObject.pid) || 0
               readonly property bool isAgentWindow: windowClass === "org.omarchy.agent"
               property string detectedAgentBinary: ""
+              readonly property string windowTitle: modelData.title || ""
 
               // Unwrap omarchy-launch-tui's "org.omarchy.<binary>" convention
               // (org.omarchy.agent is handled separately, see isAgentWindow) so
@@ -258,8 +259,11 @@ BarWidget {
 
               MouseArea {
                 anchors.fill: parent
+                hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.focusWorkspace(cell.modelData)
+                onEntered: if (root.bar) root.bar.showTooltip(icon, icon.windowTitle)
+                onExited: if (root.bar) root.bar.hideTooltip(icon)
               }
             }
           }
