@@ -84,6 +84,16 @@ BarWidget {
     return binary === "codex" ? "codex" : "claude"
   }
 
+  // omarchy-launch-tui defaults an unlabeled command's class to
+  // "org.omarchy.<binary>" (e.g. "org.omarchy.yazi" for `omarchy-launch-tui
+  // yazi`) unless the caller passes its own --app-id, as omarchy-agent does.
+  // That prefixed class never matches a real desktop entry or icon-theme
+  // name, so strip it back to the bare binary name to look up instead.
+  function tuiBinaryName(appId) {
+    var match = /^org\.omarchy\.(.+)$/.exec(String(appId || ""))
+    return match ? match[1] : ""
+  }
+
   // Descend up to 5 levels of children from the window's PID looking for a
   // known agent binary (the window's own PID is usually the terminal
   // emulator's, with the agent CLI running as its child/grandchild).
@@ -190,11 +200,19 @@ BarWidget {
               readonly property bool isAgentWindow: windowClass === "org.omarchy.agent"
               property string detectedAgentBinary: ""
 
+              // Unwrap omarchy-launch-tui's "org.omarchy.<binary>" convention
+              // (org.omarchy.agent is handled separately, see isAgentWindow) so
+              // lookups use the plain binary name a desktop entry or icon
+              // theme would actually recognize.
+              readonly property string lookupClass: (!isAgentWindow && windowClass.indexOf("org.omarchy.") === 0)
+                ? root.tuiBinaryName(windowClass)
+                : windowClass
+
               // Resolve through the app's desktop entry first, same as the Omarchy
               // app launcher menu does, since a window's app id often differs from
               // the icon name in its .desktop file (e.g. Slack, Obsidian).
-              readonly property var desktopEntry: root.findDesktopEntry(windowClass)
-              readonly property string iconName: (desktopEntry && desktopEntry.icon) || windowClass
+              readonly property var desktopEntry: root.findDesktopEntry(lookupClass)
+              readonly property string iconName: (desktopEntry && desktopEntry.icon) || lookupClass
               readonly property string overridePath: isAgentWindow
                 ? root.agentIconsPath + root.agentIconNameFor(detectedAgentBinary) + ".svg"
                 : ""
