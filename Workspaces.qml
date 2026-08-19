@@ -192,6 +192,7 @@ BarWidget {
             text: cell.modelData === 10 ? "0:" : String(cell.modelData) + ":"
             foreground: cell.focused ? Color.bar.background : (root.bar ? root.bar.barForeground : Color.foreground)
             useActiveColor: false
+            fontSize: Style.font.body - 2
             opacity: cell.occupied || cell.focused ? 1 : 0.5
             horizontalMargin: 6
             verticalPadding: 6
