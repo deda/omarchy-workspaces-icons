@@ -26,6 +26,12 @@ omarchy plugin enable deda.workspaces-icons
 omarchy plugin update deda.workspaces-icons
 ```
 
+## Remove
+
+```bash
+omarchy plugin remove deda.workspaces-icons
+```
+
 ## License
 
 [MIT](LICENSE)
