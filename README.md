@@ -5,6 +5,8 @@ An [Omarchy](https://omarchy.org/) shell bar widget — a fork of the built-in
 next to its workspace number. Click an icon to switch to that window's
 workspace.
 
+For me works best with bigger icons, e.g. `base-size = 20` in ~/.config/omarchy/shell.toml
+
 ![Preview](preview.png)
 
 ## Install
