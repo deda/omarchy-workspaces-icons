@@ -143,6 +143,17 @@ BarWidget {
     return DesktopEntries.byId(appId) || DesktopEntries.heuristicLookup(appId) || null
   }
 
+  // Workspace numbers inherit the bar's font size. `fontSizeOffset` nudges
+  // them relative to it - negative shrinks, positive grows - so the setting
+  // keeps tracking the shell's `[font] base-size` instead of pinning a pixel
+  // size that stops matching once that base size changes.
+  readonly property int fontSizeOffset: {
+    var offset = Math.round(Number(root.setting("fontSizeOffset", 0)))
+    return isFinite(offset) ? Math.max(-6, Math.min(6, offset)) : 0
+  }
+
+  readonly property real numberFontSize: Math.max(1, Style.font.body + root.fontSizeOffset)
+
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
 
   implicitWidth: grid.implicitWidth + trailingGap
@@ -193,11 +204,15 @@ BarWidget {
             text: cell.modelData === 10 ? "0:" : String(cell.modelData) + ":"
             foreground: cell.focused ? Color.bar.background : (root.bar ? root.bar.barForeground : Color.foreground)
             useActiveColor: false
-            fontSize: Style.font.body - 4
+            fontSize: root.numberFontSize
             opacity: cell.occupied || cell.focused ? 1 : 0.5
             horizontalMargin: 6
             verticalPadding: 6
-            fixedWidth: root.vertical ? root.barSize : Style.space(20)
+            // Fixed slot so the numbers stay on a common grid, but it has
+            // to grow past that grid when a larger font makes the label
+            // outrun it - otherwise the number spills into the icons.
+            fixedWidth: root.vertical ? root.barSize
+              : Math.max(Style.space(20), numberButton.labelWidth + numberButton.scaledHorizontalMargin * 2)
             fixedHeight: root.barSize
             onPressed: function() { root.focusWorkspace(cell.modelData) }
           }
