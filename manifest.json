@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "deda.workspaces-icons",
   "name": "Workspaces with Window Icons",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "deda",
   "license": "MIT",
   "description": "Workspace number indicators that also show the icon of each running window on that workspace, clickable to switch",
@@ -16,6 +16,21 @@
     "displayName": "Workspaces with Window Icons",
     "description": "Workspace number indicators with running window icons",
     "category": "Compositor",
-    "allowMultiple": false
+    "allowMultiple": false,
+    "defaults": {
+      "fontSizeOffset": 0
+    },
+    "schema": [
+      {
+        "key": "fontSizeOffset",
+        "type": "integer",
+        "label": "Workspace number size offset",
+        "description": "Shifts the workspace number away from the bar's font size. 0 matches the rest of the bar; negative values shrink it.",
+        "min": -6,
+        "max": 6,
+        "step": 1,
+        "defaultValue": 0
+      }
+    ]
   }
 }
