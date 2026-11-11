@@ -46,16 +46,25 @@ larger than the rest of the bar, set an offset (in pixels, `-6` to `6`):
 omarchy bar set deda.workspaces-icons fontSizeOffset -2
 ```
 
+The window icons follow the bar's font size too (via the shell's spacing
+scale). Nudge them the same way, in pixels from `-8` to `12`; they are capped
+at the bar's height:
+
+```bash
+omarchy bar set deda.workspaces-icons iconSizeOffset 4
+```
+
 Or edit the widget's entry in `~/.config/omarchy/shell.json` directly, which
 hot-reloads on save:
 
 ```json
-{ "id": "deda.workspaces-icons", "fontSizeOffset": -2 }
+{ "id": "deda.workspaces-icons", "fontSizeOffset": -2, "iconSizeOffset": 4 }
 ```
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `fontSizeOffset` | integer, `-6`..`6` | `0` | Pixels added to the bar's font size for the workspace number. `0` matches the rest of the bar. |
+| `iconSizeOffset` | integer, `-8`..`12` | `0` | Pixels added to the window icons' default size (which scales with the bar's font size). `0` keeps the default; never exceeds the bar's height. |
 
 ## Update
 

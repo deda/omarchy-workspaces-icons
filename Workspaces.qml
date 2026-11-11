@@ -251,6 +251,18 @@ BarWidget {
 
   readonly property real numberFontSize: Math.max(1, Style.font.body + root.fontSizeOffset)
 
+  // Window icons default to the shell's spacing scale (`Style.space(10)`,
+  // which tracks `[font] base-size`). `iconSizeOffset` nudges them relative
+  // to that, the same way `fontSizeOffset` does for the numbers, and the
+  // result is capped at the bar's thickness so a large offset can't spill
+  // out of the bar.
+  readonly property int iconSizeOffset: {
+    var offset = Math.round(Number(root.setting("iconSizeOffset", 0)))
+    return isFinite(offset) ? Math.max(-8, Math.min(12, offset)) : 0
+  }
+
+  readonly property real iconSize: Math.max(4, Math.min(root.barSize, Style.space(10) + root.iconSizeOffset))
+
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
 
   implicitWidth: grid.implicitWidth + trailingGap
@@ -282,7 +294,7 @@ BarWidget {
         readonly property int slot: root.slotOf(modelData)
         readonly property bool firstGuest: root.blockOf(modelData) !== root.block && index > 0
           && root.blockOf(root.workspaceIds()[index - 1]) === root.block
-        readonly property real iconSize: Style.space(10)
+        readonly property real iconSize: root.iconSize
 
         // A gap sets visiting workspaces apart from the monitor's own.
         Layout.leftMargin: firstGuest && !root.vertical ? Style.space(6) : 0

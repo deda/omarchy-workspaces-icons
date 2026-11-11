@@ -18,7 +18,8 @@
     "category": "Compositor",
     "allowMultiple": false,
     "defaults": {
-      "fontSizeOffset": 0
+      "fontSizeOffset": 0,
+      "iconSizeOffset": 0
     },
     "schema": [
       {
@@ -28,6 +29,16 @@
         "description": "Shifts the workspace number away from the bar's font size. 0 matches the rest of the bar; negative values shrink it.",
         "min": -6,
         "max": 6,
+        "step": 1,
+        "defaultValue": 0
+      },
+      {
+        "key": "iconSizeOffset",
+        "type": "integer",
+        "label": "Window icon size offset",
+        "description": "Shifts the window icons away from their default size, which follows the bar's font size. 0 keeps the default; negative values shrink them. Icons never grow past the bar's height.",
+        "min": -8,
+        "max": 12,
         "step": 1,
         "defaultValue": 0
       }
