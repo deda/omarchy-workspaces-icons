@@ -81,4 +81,8 @@ omarchy plugin remove deda.workspaces-icons
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). This plugin is a fork of Omarchy's built-in
+`omarchy.workspaces` widget and keeps substantial portions of it, so
+[LICENSE](LICENSE) carries both notices: this plugin's (Copyright (c) 2026
+deda) and Omarchy's upstream MIT notice (Copyright (c) David Heinemeier
+Hansson), reproduced in full.

@@ -1,3 +1,8 @@
+// Fork of Omarchy's built-in omarchy.workspaces bar widget
+// (https://github.com/omacom/omarchy), Copyright (c) David Heinemeier
+// Hansson, MIT License. Modifications Copyright (c) 2026 deda, MIT License.
+// See LICENSE for both notices in full.
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
