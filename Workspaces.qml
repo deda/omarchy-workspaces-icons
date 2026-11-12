@@ -196,6 +196,15 @@ BarWidget {
     return match ? match[1] : ""
   }
 
+  // A window picks its own app id, and the icon lookup doesn't treat it as a
+  // plain name: QIcon::fromTheme reads an absolute name as a file path, the
+  // theme loader joins it onto icon directories (so "../" escapes them), and
+  // Quickshell's icon provider parses "?path=" / "?fallback=" out of it. Only
+  // let a raw app id through as an icon name when it looks like one.
+  function isThemeIconName(value) {
+    return /^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$/.test(String(value || ""))
+  }
+
   // Descend up to 5 levels of children from the window's PID looking for a
   // known agent binary (the window's own PID is usually the terminal
   // emulator's, with the agent CLI running as its child/grandchild).
@@ -379,7 +388,13 @@ BarWidget {
                 // app launcher menu does, since a window's app id often differs from
                 // the icon name in its .desktop file (e.g. Slack, Obsidian).
                 readonly property var desktopEntry: root.findDesktopEntry(lookupClass)
-                readonly property string iconName: (desktopEntry && desktopEntry.icon) || lookupClass
+                // A desktop entry's Icon= is trusted as is. The raw app id is
+                // not (see isThemeIconName): anything that doesn't look like an
+                // icon name gets the fixed generic icon instead.
+                readonly property string iconName: (desktopEntry && desktopEntry.icon) ? desktopEntry.icon
+                  : root.isThemeIconName(lookupClass) ? lookupClass
+                  : lookupClass !== "" ? "application-x-executable"
+                  : ""
                 readonly property string overridePath: isAgentWindow
                   ? root.agentIconsPath + root.agentIconNameFor(detectedAgentBinary) + ".svg"
                   : ""
